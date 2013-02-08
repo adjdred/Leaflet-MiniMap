@@ -6,7 +6,8 @@ L.Control.MiniMap = L.Control.extend({
 		zoomLevelFixed: false,
 		zoomAnimation: false,
 		width: 150,
-		height: 150
+		height: 150,
+		mapOptions:{} // Allows the user to customise the mini map
 	},
 	//layer is the map layer to be shown in the minimap
 	initialize: function (layer, options) {
@@ -25,9 +26,7 @@ L.Control.MiniMap = L.Control.extend({
 		L.DomEvent.disableClickPropagation(this._container);
 		L.DomEvent.on(this._container, 'mousewheel', L.DomEvent.stopPropagation);
 
-
-		this._miniMap = new L.Map(this._container,
-		{
+		var miniMapOptions = {
 			attributionControl: false,
 			zoomControl: false,
 			zoomAnimation: this.options.zoomAnimation,
@@ -35,7 +34,13 @@ L.Control.MiniMap = L.Control.extend({
 			scrollWheelZoom: !this.options.zoomLevelFixed,
 			doubleClickZoom: !this.options.zoomLevelFixed,
 			boxZoom: !this.options.zoomLevelFixed
-		});
+		};
+
+		// Merge map options for the mini map to remove extra plugin map overrides
+		L.Util.extend(miniMapOptions,this.options.mapOptions);
+
+		this._miniMap = new L.Map(this._container,miniMapOptions);
+		
 		//We make a copy so that the original layer object is untouched, this way we can add/remove multiple times
 		this._miniMap.addLayer(L.Util.clone (this._layer));
 
